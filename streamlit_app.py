@@ -5,7 +5,7 @@ import joblib
 # -----------------------------
 # Load the trained pipeline
 # -----------------------------
-model = joblib.load("models/campaign_event_model.pkl")
+model = joblib.load("models/campaign_event_model_1.pkl")
 labels = ["Awareness", "Engagement", "Conversion"]
 
 st.title("📊 Campaign Event Predictor — AI Model")
