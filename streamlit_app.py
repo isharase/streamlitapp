@@ -14,11 +14,18 @@ st.title("📊 Campaign Event Predictor — AI Model")
 # Helper function: align input with training columns
 # -----------------------------
 def align_features(input_df, model):
-    """Reorder and align input_df columns to match model expectations."""
+    """Align input dataframe with model training columns."""
     if hasattr(model, "feature_names_in_"):
-        expected_cols = model.feature_names_in_
-        # Reindex ensures correct order; missing cols = NaN
-        input_df = input_df.reindex(columns=expected_cols)
+        expected_cols = list(model.feature_names_in_)
+        # Reindex ensures correct column order; missing columns become NaN
+        aligned = input_df.reindex(columns=expected_cols)
+        # Fill NaN values (categoricals with empty string, numerics with 0)
+        for col in aligned.columns:
+            if aligned[col].dtype == "O":
+                aligned[col] = aligned[col].fillna("")
+            else:
+                aligned[col] = aligned[col].fillna(0)
+        return aligned
     return input_df
 
 # -----------------------------
@@ -72,6 +79,11 @@ if st.button("Predict for Manual Input"):
     }])
 
     aligned = align_features(input_df, model)
+
+    # Debug info (can be removed later)
+    st.write("Model expects:", list(model.feature_names_in_))
+    st.write("Input DF after alignment:", aligned)
+
     pred = model.predict(aligned)[0]
     prob = model.predict_proba(aligned)[0]
 
